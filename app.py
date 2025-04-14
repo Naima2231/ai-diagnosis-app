@@ -17,14 +17,20 @@ rash = st.selectbox("Rash", ["No", "Yes"])
 photosensitivity = st.selectbox("Photosensitivity", ["No", "Yes"])
 
 # Convert to model input format
+# Make sure features match training data exactly
 features = {
-    "Age": age,
-    "Joint Pain": 1 if joint_pain == "Yes" else 0,
-    "Fatigue": 1 if fatigue == "Yes" else 0,
-    "Fever": 1 if fever == "Yes" else 0,
-    "Rash": 1 if rash == "Yes" else 0,
-    "Photosensitivity": 1 if photosensitivity == "Yes" else 0,
+    'Age': age,
+    'Joint Pain': 1 if joint_pain == "Yes" else 0,
+    'Fatigue': 1 if fatigue == "Yes" else 0,
+    'Fever': 1 if fever == "Yes" else 0,
+    'Rash': 1 if rash == "Yes" else 0,
+    'Photosensitivity': 1 if photosensitivity == "Yes" else 0,
 }
+
+# Match column order exactly as in training data
+input_df = pd.DataFrame([features])
+input_df = input_df[['Age', 'Joint Pain', 'Fatigue', 'Fever', 'Rash', 'Photosensitivity']]
+
 
 # Predict button
 if st.button("Diagnose"):
