@@ -2,43 +2,52 @@ import streamlit as st
 import pandas as pd
 import joblib
 
-# Load your saved model
-model = joblib.load('xgboost_model.pkl')
-
+# Title
 st.title("Autoimmune Disease Diagnosis AI")
-st.write("Enter the patient's symptoms and get a prediction.")
 
-# User input fields
-age = st.number_input("Age", min_value=0, max_value=120, step=1)
-joint_pain = st.selectbox("Joint Pain", ["No", "Yes"])
-fatigue = st.selectbox("Fatigue", ["No", "Yes"])
-fever = st.selectbox("Fever", ["No", "Yes"])
-rash = st.selectbox("Rash", ["No", "Yes"])
-photosensitivity = st.selectbox("Photosensitivity", ["No", "Yes"])
+# Description
+st.write("Enter symptoms and lab info to predict if the patient has RA, SLE, or is Healthy.")
 
-# Convert to model input format
-# Make sure features match training data exactly
+# Load the trained model
+model = joblib.load("xgboost_model.pkl")
+
+# User input
+age = st.slider("Age", 10, 90, 30)
+joint_pain = st.selectbox("Joint Pain", ["Yes", "No"])
+fatigue = st.selectbox("Fatigue", ["Yes", "No"])
+fever = st.selectbox("Fever", ["Yes", "No"])
+rash = st.selectbox("Rash", ["Yes", "No"])
+photosensitivity = st.selectbox("Photosensitivity", ["Yes", "No"])
+
+# Match the features exactly as trained
 features = {
-    'Age': age,
-    'Joint Pain': 1 if joint_pain == "Yes" else 0,
-    'Fatigue': 1 if fatigue == "Yes" else 0,
-    'Fever': 1 if fever == "Yes" else 0,
-    'Rash': 1 if rash == "Yes" else 0,
-    'Photosensitivity': 1 if photosensitivity == "Yes" else 0,
+    'age': age,
+    'joint_pain': 1 if joint_pain == "Yes" else 0,
+    'fatigue': 1 if fatigue == "Yes" else 0,
+    'fever': 1 if fever == "Yes" else 0,
+    'rash': 1 if rash == "Yes" else 0,
+    'photosensitivity': 1 if photosensitivity == "Yes" else 0,
 }
 
-# Match column order exactly as in training data
+# Create input DataFrame with correct column order
 input_df = pd.DataFrame([features])
-input_df = input_df[['Age', 'Joint Pain', 'Fatigue', 'Fever', 'Rash', 'Photosensitivity']]
+input_df = input_df[['age', 'joint_pain', 'fatigue', 'fever', 'rash', 'photosensitivity']]
 
-
-# Predict button
-if st.button("Diagnose"):
-    input_df = pd.DataFrame([features])
+# Predict when button clicked
+if st.button("Predict"):
     prediction = model.predict(input_df)[0]
+
+    # Show result
+    st.subheader("Prediction Result:")
     if prediction == 0:
-        st.success("Diagnosis: Rheumatoid Arthritis (RA)")
+        st.success("✅ Diagnosis: Healthy")
     elif prediction == 1:
-        st.success("Diagnosis: Systemic Lupus Erythematosus (SLE)")
+        st.warning("⚠️ Diagnosis: Rheumatoid Arthritis (RA)")
+    elif prediction == 2:
+        st.error("🚨 Diagnosis: Systemic Lupus Erythematosus (SLE)")
     else:
-        st.success("Diagnosis: Healthy")
+        st.info("Unknown prediction.")
+
+
+
+   
