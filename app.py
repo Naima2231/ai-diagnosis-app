@@ -11,6 +11,10 @@ st.write("Enter symptoms and lab info to predict if the patient has RA, SLE, or 
 # Load the trained model
 model = joblib.load("xgboost_model.pkl")
 
+# 🔍 DEBUG LINE – This will print the exact feature names the model expects
+st.write("🧠 Model expects these features (must match exactly):")
+st.write(model.get_booster().feature_names)
+
 # User input
 age = st.slider("Age", 10, 90, 30)
 joint_pain = st.selectbox("Joint Pain", ["Yes", "No"])
@@ -19,7 +23,7 @@ fever = st.selectbox("Fever", ["Yes", "No"])
 rash = st.selectbox("Rash", ["Yes", "No"])
 photosensitivity = st.selectbox("Photosensitivity", ["Yes", "No"])
 
-# Match the features exactly as trained
+# 🧠 TEMPORARY structure (we will update this to match the model's features after you run it)
 features = {
     'age': age,
     'joint_pain': 1 if joint_pain == "Yes" else 0,
@@ -29,7 +33,6 @@ features = {
     'photosensitivity': 1 if photosensitivity == "Yes" else 0,
 }
 
-# Create input DataFrame with correct column order
 input_df = pd.DataFrame([features])
 input_df = input_df[['age', 'joint_pain', 'fatigue', 'fever', 'rash', 'photosensitivity']]
 
@@ -47,7 +50,3 @@ if st.button("Predict"):
         st.error("🚨 Diagnosis: Systemic Lupus Erythematosus (SLE)")
     else:
         st.info("Unknown prediction.")
-
-
-
-   
