@@ -1,0 +1,45 @@
+import streamlit as st
+import pandas as pd
+import joblib
+
+# Load the saved model
+model = joblib.load('xgboost_model.pkl')
+
+# Define a function to predict disease based on user input
+def predict_disease(symptoms):
+    # Here, make sure the user input data matches the feature format (same columns)
+    input_data = pd.DataFrame([symptoms])  # Convert input into dataframe
+    prediction = model.predict(input_data)
+    return prediction
+
+# Streamlit UI
+st.title('AI Diagnosis for Autoimmune Diseases')
+
+# Get user input
+age = st.number_input('Age', min_value=0)
+joint_pain = st.selectbox('Joint Pain', ['No', 'Yes'])
+fatigue = st.selectbox('Fatigue', ['No', 'Yes'])
+fever = st.selectbox('Fever', ['No', 'Yes'])
+rash = st.selectbox('Rash', ['No', 'Yes'])
+photosensitivity = st.selectbox('Photosensitivity', ['No', 'Yes'])
+
+# Convert user input to numeric
+symptoms = {
+    'Age': age,
+    'Joint Pain': 1 if joint_pain == 'Yes' else 0,
+    'Fatigue': 1 if fatigue == 'Yes' else 0,
+    'Fever': 1 if fever == 'Yes' else 0,
+    'Rash': 1 if rash == 'Yes' else 0,
+    'Photosensitivity': 1 if photosensitivity == 'Yes' else 0
+}
+
+# Prediction when button is pressed
+if st.button('Diagnose'):
+    disease = predict_disease(symptoms)
+    
+    if disease == 0:
+        st.write("Diagnosis: Rheumatoid Arthritis (RA)")
+    elif disease == 1:
+        st.write("Diagnosis: Systemic Lupus Erythematosus (SLE)")
+    else:
+        st.write("Diagnosis: Healthy")
